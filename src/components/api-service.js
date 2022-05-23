@@ -16,15 +16,11 @@ export default class ApiService {
             per_page: 40,
         }
      try {
-
-         const response = await axios.get(`https://pixabay.com/api/?key=27515523-9dca8758fab0b717270f23e63&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=40`)
+         const response = await axios.get(`https://pixabay.com/api/?key=27515523-9dca8758fab0b717270f23e63&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=40`)            
             
-             .then(({ card }) => {
-                 this.incrementPage();
-                 return card;
-             })
-     }
-            
+               this.incrementPage();
+               return response;             
+     }            
      catch (error) {
     console.error(error);
   }
@@ -36,6 +32,7 @@ export default class ApiService {
     resetPage() {
         this.page = 1;
     }
+    
     get query() {
         return this.searchQuery;
     }
