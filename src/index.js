@@ -9,7 +9,6 @@ const refs = {
     formEl: document.querySelector('.search-form'),
     galleryEl: document.querySelector('.gallery'),
     sentinel: document.querySelector('#sentinel'),
- //   loadMoreBtn: document.querySelector('.load-more'),
 };
 const apiService = new ApiService();
 
@@ -20,14 +19,13 @@ function renderGallery(data) {
     refs.galleryEl.insertAdjacentHTML("beforeend", markup);
 }
 const lightbox = new SimpleLightbox('.gallery a', {
-    captionPosition:'bottom',
+    captionsData: 'alt',
     captionDelay:250,
-    enableKeyboard:true
+    enableKeyboard: true,
 });
 lightbox.refresh();
 
 refs.formEl.addEventListener('submit', onSearch);
-//refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
 function onSearch(e) {
     e.preventDefault();
@@ -51,12 +49,7 @@ function onSearch(e) {
         }       
     });    
 }   
-//function onLoadMore() {
-//    apiService.getPicters().then(({ data }) => {
-//        appendPicters(data.hits);       
-//lightbox.refresh();
-//    });
-//}
+
 function appendPicters(card) {
     refs.galleryEl.insertAdjacentHTML('beforeend', pictureCard(card));
 }
@@ -76,15 +69,21 @@ window.addEventListener('scroll', () => {
     }
 });
 
-const scrollBtn = document.querySelector('.isShowBtn')
-window.onscroll = () => {
-    if (window.scrollY > 700) {
-        scrollBtn.classList.remove('isShowBtn_hide');
-        if (window.scrollY < 700) {
-          scrollBtn.classList.add('isShowBtn_hide');  
-        }
+const offset = 700;
+const scrollUp = document.querySelector('.scroll-up');
+
+const getTop = () => window.pageYOffset || document.documentElement.scrollTop;
+
+window.addEventListener('scroll', () => {
+    if (getTop() > offset) {
+        scrollUp.classList.add('scroll-up__active');
+    } else {
+        scrollUp.classList.remove('scroll-up__active');
     }
-}
-scrollBtn.onclick = () => {
-    window.scrollTo(0, 0);
-}
+});
+scrollUp.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+})
