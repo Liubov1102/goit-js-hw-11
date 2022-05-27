@@ -4,11 +4,12 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import pictureCard from './templates/card.hbs';
 import ApiService from './components/api-service';
+//import { apiService } from './components/api-service';
+//import { getPicters } from './components/api-service';
 
 const refs = {
     formEl: document.querySelector('.search-form'),
     galleryEl: document.querySelector('.gallery'),
-    sentinel: document.querySelector('#sentinel'),
 };
 const apiService = new ApiService();
 
@@ -29,14 +30,13 @@ refs.formEl.addEventListener('submit', onSearch);
 
 function onSearch(e) {
     e.preventDefault();
-    outputClear();
+    outputClear(); 
     apiService.resetPage();
     apiService.query = e.currentTarget.elements.searchQuery.value;
         if (apiService.query.trim() === "") {
             Notiflix.Notify.failure('Please fill in the field');
             return;
         }
-
     apiService.getPicters().then(({ data }) => {
         appendPicters(data.hits);
         lightbox.refresh();
@@ -56,12 +56,12 @@ function appendPicters(card) {
 
 function outputClear() {
     refs.galleryEl.innerHTML = '';
-};
+};   
 
 window.addEventListener('scroll', () => {
     const documentRect = document.documentElement.getBoundingClientRect();
     if (documentRect.bottom < document.documentElement.clientHeight + 150) {
-        
+        apiService.incrementPage();
         apiService.getPicters().then(({ data }) => {
             appendPicters(data.hits);
             lightbox.refresh();
