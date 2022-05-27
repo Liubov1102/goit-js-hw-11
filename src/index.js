@@ -10,6 +10,7 @@ import ApiService from './components/api-service';
 const refs = {
     formEl: document.querySelector('.search-form'),
     galleryEl: document.querySelector('.gallery'),
+     sentinel: document.querySelector('#sentinel'),
 };
 const apiService = new ApiService();
 
@@ -58,20 +59,24 @@ function outputClear() {
     refs.galleryEl.innerHTML = '';
 };   
 
-window.addEventListener('scroll', () => {
-    const documentRect = document.documentElement.getBoundingClientRect();
-    if (documentRect.bottom < document.documentElement.clientHeight + 150) {
-        apiService.incrementPage();
+const onEntry = entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && apiService.query !== '') {
+     apiService.incrementPage();
         apiService.getPicters().then(({ data }) => {
             appendPicters(data.hits);
             lightbox.refresh();
-        });
+      });
     }
+  });
+};
+const observer = new IntersectionObserver(onEntry, {
+  rootMargin: '150px',
 });
+observer.observe(refs.sentinel);
 
 const offset = 700;
 const scrollUp = document.querySelector('.scroll-up');
-
 const getTop = () => window.pageYOffset || document.documentElement.scrollTop;
 
 window.addEventListener('scroll', () => {

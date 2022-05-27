@@ -7,7 +7,6 @@ export default class ApiService {
         this.searchQuery = '';
         this.page = 1;
     }
-
     async getPicters() {
         const params = {
             key: API_KEY,
@@ -19,9 +18,8 @@ export default class ApiService {
             per_page: 40,
         }
      try {
-         const response = await axios.get(URL, {params})            
-            
-               this.incrementPage();
+         const response = await axios.get(URL, {params})                  
+         this.incrementPage();
                return response;             
      }            
      catch (error) {
