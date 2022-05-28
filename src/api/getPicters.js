@@ -2,12 +2,29 @@ import axios from 'axios';
 
 const URL = 'https://pixabay.com/api/';
 const API_KEY = '27515523-9dca8758fab0b717270f23e63';
+/*
 export default class ApiService {
     constructor() {
         this.searchQuery = '';
-        this.page = 1;
+        this.page = 1;             
     }
+//    constructor() {        
+//        this.params = {
+//            key: API_KEY,
+//            q: '',
+//            image_type: 'photo',
+//            orientation: 'horizontal',
+//            safesearch: 'true',
+//            page: 1,
+//            per_page: 40,
+//        }
+//    }
     async getPicters() {
+//        const params = {
+//            key: API_KEY,
+//            ...this.params
+//        }
+//        console.log(params);
         const params = {
             key: API_KEY,
             q: this.searchQuery,
@@ -39,7 +56,8 @@ export default class ApiService {
         this.searchQuery = newQuery;
     }  
 };
-/*
+*/
+
 export const apiService = {
             q: '',
             image_type: 'photo',
@@ -57,8 +75,7 @@ const customAxios = axios.create({
         orientation: 'horizontal',
         safesearch: 'true',
         page: 1,
-        per_page: 40,
-        
+        per_page: 40,        
     }
 });
 export const getPicters = async (params) => {
@@ -72,7 +89,7 @@ export const getPicters = async (params) => {
         console.log('message');
     }
 }
-*/
+
 
 
 

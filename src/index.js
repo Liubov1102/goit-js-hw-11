@@ -3,17 +3,17 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import pictureCard from './templates/card.hbs';
-import ApiService from './components/api-service';
-//import { apiService } from './components/api-service';
-//import { getPicters } from './components/api-service';
+//import ApiService from './api/getPicters.js';
+import { apiService } from './api/getPicters.js';
+import { getPicters } from './api/getPicters.js';
 
 const refs = {
     formEl: document.querySelector('.search-form'),
     galleryEl: document.querySelector('.gallery'),
      sentinel: document.querySelector('#sentinel'),
 };
-const apiService = new ApiService();
-
+//const apiService = new ApiService();
+let currentPage = 1;
 function renderGallery(data) {
     let markup = '';
     data.hits.map(item => { markup += pictureCard(item) });
@@ -32,13 +32,14 @@ refs.formEl.addEventListener('submit', onSearch);
 function onSearch(e) {
     e.preventDefault();
     outputClear(); 
-    apiService.resetPage();
+    //apiService.resetPage();
+    currentPage = 1;
     apiService.query = e.currentTarget.elements.searchQuery.value;
         if (apiService.query.trim() === "") {
             Notiflix.Notify.failure('Please fill in the field');
             return;
         }
-    apiService.getPicters().then(({ data }) => {
+    getPicters().then(({ data }) => {
         appendPicters(data.hits);
         lightbox.refresh();
         if (data.totalHits === 0) {
@@ -58,10 +59,11 @@ function appendPicters(card) {
 function outputClear() {
     refs.galleryEl.innerHTML = '';
 };   
-
+/*
 const onEntry = entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting && apiService.query !== '') {
+
      apiService.incrementPage();
         apiService.getPicters().then(({ data }) => {
             appendPicters(data.hits);
@@ -70,13 +72,25 @@ const onEntry = entries => {
     }
   });
 };
+
 const observer = new IntersectionObserver(onEntry, {
   rootMargin: '150px',
 });
 observer.observe(refs.sentinel);
-
+*/
+window.addEventListener("scroll", () => {
+    const docRect = document.documentElement.getBoundingClientRect();
+    if (docRect.bottom < document.documentElement.clientHeight + 150) {
+        currentPage += 1;
+        getPicters().then(({ data }) => {
+            appendPicters(data.hits);
+            lightbox.refresh();
+        });
+    }
+});
 const offset = 700;
 const scrollUp = document.querySelector('.scroll-up');
+
 const getTop = () => window.pageYOffset || document.documentElement.scrollTop;
 
 window.addEventListener('scroll', () => {
