@@ -1,96 +1,71 @@
+
 import './css/styles.css';
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import pictureCard from './templates/card.hbs';
-//import ApiService from './api/getPicters.js';
-import { apiService } from './api/getPicters.js';
-import { getPicters } from './api/getPicters.js';
+import API from './api/getPicters.js';
 
 const refs = {
     formEl: document.querySelector('.search-form'),
-    galleryEl: document.querySelector('.gallery'),
-     sentinel: document.querySelector('#sentinel'),
-};
-//const apiService = new ApiService();
-let currentPage = 1;
-function renderGallery(data) {
-    let markup = '';
-    data.hits.map(item => { markup += pictureCard(item) });
-  
-    refs.galleryEl.insertAdjacentHTML("beforeend", markup);
+    galleryEl: document.querySelector('.gallery'), 
+}
+
+async function renderGallery() {
+    const result = await API.getPicters();
+    appendPicters(result.data.totalHits);
+    
 }
 const lightbox = new SimpleLightbox('.gallery a', {
     captionsData: 'alt',
     captionDelay:250,
     enableKeyboard: true,
 });
-lightbox.refresh();
+lightbox.refresh()
 
-refs.formEl.addEventListener('submit', onSearch);
+refs.formEl.addEventListener('submit', onSearch)
 
 function onSearch(e) {
     e.preventDefault();
     outputClear(); 
-    //apiService.resetPage();
-    currentPage = 1;
-    apiService.query = e.currentTarget.elements.searchQuery.value;
-        if (apiService.query.trim() === "") {
+    API.params.page = 1;
+    API.params.q = e.currentTarget.elements.searchQuery.value;
+        if (API.params.q.trim() === "") {
             Notiflix.Notify.failure('Please fill in the field');
             return;
         }
-    getPicters().then(({ data }) => {
+        renderGallery();
+    API.getPicters().then(({ data } = {}) => {
         appendPicters(data.hits);
         lightbox.refresh();
-        if (data.totalHits === 0) {
+        if (data?.totalHits === 0) {
             Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again');
             return;
         }        
-            if (data.totalHits !== 0) {
+            if (data?.totalHits !== 0) {
                 Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images!`);
         }       
     });    
 }   
-
 function appendPicters(card) {
     refs.galleryEl.insertAdjacentHTML('beforeend', pictureCard(card));
 }
-
 function outputClear() {
     refs.galleryEl.innerHTML = '';
 };   
-/*
-const onEntry = entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting && apiService.query !== '') {
 
-     apiService.incrementPage();
-        apiService.getPicters().then(({ data }) => {
-            appendPicters(data.hits);
-            lightbox.refresh();
-      });
-    }
-  });
-};
-
-const observer = new IntersectionObserver(onEntry, {
-  rootMargin: '150px',
-});
-observer.observe(refs.sentinel);
-*/
 window.addEventListener("scroll", () => {
     const docRect = document.documentElement.getBoundingClientRect();
     if (docRect.bottom < document.documentElement.clientHeight + 150) {
-        currentPage += 1;
-        getPicters().then(({ data }) => {
-            appendPicters(data.hits);
+        API.params.page += 1;
+        API.getPicters().then(({ data } = {}) => {
+            appendPicters(data?.hits);
             lightbox.refresh();
         });
     }
 });
 const offset = 700;
 const scrollUp = document.querySelector('.scroll-up');
-
 const getTop = () => window.pageYOffset || document.documentElement.scrollTop;
 
 window.addEventListener('scroll', () => {
